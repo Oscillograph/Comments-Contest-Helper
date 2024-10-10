@@ -55,6 +55,8 @@ if ($week_number > 0)
 	$week_end = $seasons[$workspace['current_season']]['starting_date'] + $week_number*($week_length-1);
 }
 
+$week_number = ($week_number > 14) ? $week_number : 14; // prevent week number from going to infinity. TODO: allow to close a season
+
 
 // = = = = = functions block = = = = =
 // proudly heavily based on sectus' edit of Jaison Erick's answer on https://stackoverflow.com/questions/7929796/how-can-i-sort-an-array-of-utf-8-strings-in-php
