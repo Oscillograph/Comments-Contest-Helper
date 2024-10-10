@@ -104,7 +104,7 @@ for ($i = 0; $i < $commentators_count; ++$i)
 			$out .= '[b]'.$commentators_names[$i]."[b]\n";
 			for ($j = 0; $j < $links_count; ++$j)
 			{
-				$out .= '[url='.$links[$commentators_names[$i]][$j].']'.$links[$commentators_names[$i]][$j].'[/url]'."\n";
+				$out .= $links[$commentators_names[$i]][$j]."\n";
 			}
 			$out .= "\n";
 		}
