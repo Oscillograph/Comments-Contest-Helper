@@ -1,0 +1,119 @@
+body
+{
+	background-color: #000000;
+	color: #ffffff;
+}
+
+a
+{
+	text-decoration: underline;
+	color: #ffff00;
+}
+
+#header-table
+{
+	width: 100%;
+	text-align: center;
+	background-color: #446688;
+	color: #ffffff;
+}
+
+#header-table td
+{
+	max-width: 20%;
+	height: 1.5em;
+	vertical-align: middle;
+	text-align: center;
+	font-weight: 700;
+}
+
+#header-table td:hover
+{
+	background-color: #4488aa;
+	cursor: pointer;
+}
+
+#content-table
+{
+	width: 100%;
+	height: 85%;
+	color: #ffffff;
+}
+
+#content-table td
+{
+	vertical-align: top;
+}
+
+#poll_post td
+{
+	padding-left: 0.25em;
+}
+
+#copyright
+{
+	font-size: 0.75em;
+	text-align: right;
+}
+
+
+/* div classes */
+.header
+{
+	display: block;
+	text-align: center;
+	background-color: #446688;
+	color: #ffffff;
+	font-weight: 700;
+}
+
+.gbox
+{
+	/* margin-bottom: 0.5em; */
+	vertical-align: top;
+	display: block;
+	border: 1px solid #ffff00;
+	background-color: #000000;
+	color: #ffffff;
+}
+
+.nominated-link
+{
+	height: 1.5em;
+}
+
+.nominated-link a
+{
+	display: inline-block;
+	vertical-align: middle;
+	margin-top: 0.25em;
+	margin-left: 0.25em;
+	font-size: 1em;
+}
+
+/* forms */
+.input-button
+{
+	background-color: #224466;
+	height: 1.75em;
+	color: #ffffff;
+	border: 1px solid #ffff00;
+}
+
+.input-edit
+{
+	border: 1px solid #ffff00;
+	height: 1.75em;
+	color: #000000;
+	background-color: #ffffff;
+}
+
+.red 
+{
+	background-color: #884422;
+}
+
+.green
+{
+	background-color: #448822;
+}
