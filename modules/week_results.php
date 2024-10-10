@@ -253,7 +253,7 @@ if ($step != 4)
 			{
 				$score += $scores[$j];
 			}
-			$score = $score / count($contestants);
+			$score = round(100*$score / count($contestants))/100;
 
 			// grant scores to contestants
 			foreach($contestants as $nickname => $value)
@@ -304,7 +304,7 @@ if ($step != 4)
 			<td><?=$results[$nickname]['votes'];?></td>
 			<td><?=$results[$nickname]['additional_votes'];?></td>
 			<td><?=$results[$nickname]['votes_total'];?></td>
-			<td><?=$results[$nickname]['score'];?></td>
+			<td><?=round(100*$results[$nickname]['score'])/100;?></td>
 		</tr>
 <?php
 				}
@@ -354,11 +354,11 @@ if ($step != 4)
 
 		foreach($results as $nickname => $array)
 		{
-			if (!$commentators[$nickname]['removed'] && isset($array['score']))
+			if (!$commentators[$nickname]['removed'] && isset($array['votes_total']) && isset($array['score']))
 			{
-				if ($array['score'] > 0)
+				if (($array['votes_total'] > 0) && ($array['score'] > 0))
 				{
-					$winners[] = [$nickname, $array['score']];
+					$winners[] = [$nickname, $array['votes_total']];
 				}
 			}
 		}
@@ -375,7 +375,7 @@ if ($step != 4)
 			<td><?=$results[$nickname]['votes'];?></td>
 			<td><?=$results[$nickname]['additional_votes'];?></td>
 			<td><?=$results[$nickname]['votes_total'];?></td>
-			<td><?=$results[$nickname]['score'];?></td>
+			<td><?=round(100*$results[$nickname]['score'])/100;?></td>
 		</tr>
 <?php
 		}

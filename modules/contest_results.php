@@ -65,7 +65,10 @@ $links_count = count($links);
 		$commentators[$nickname]['score_total'] = 0;
 		for ($i = 0; $i < $weeks_count; ++$i)
 		{
-			$commentators[$nickname]['score_total'] += $commentators[$nickname]['score_weeks'][$i+1];
+			if (isset($commentators[$nickname]['score_weeks'][$i+1]))
+			{
+				$commentators[$nickname]['score_total'] += $commentators[$nickname]['score_weeks'][$i+1];
+			}
 		}
 		$winners[] = [$nickname, $commentators[$nickname]['score_total']];
 	}
@@ -83,14 +86,14 @@ $links_count = count($links);
 			echo "<td style='text-align: center;'>".$winners[$i][0]."</td>";
 			for ($j = 0; $j < 14; ++$j)
 			{
-				if ($j < count($commentators[$winners[$i][0]]['score_weeks']))
+				if (($j < count($commentators[$winners[$i][0]]['score_weeks'])) && isset($commentators[$winners[$i][0]]['score_weeks'][$j+1]))
 				{
 					echo "<td style='" . (($j < 13) ? "border-right: 1px solid #224488; " : "") . "text-align: center;'>" . $commentators[$winners[$i][0]]['score_weeks'][$j+1] . "</td>";
 				} else {
 					echo "<td style='" . (($j < 13) ? "border-right: 1px solid #224488; " : "") . "text-align: center;'> . </td>";
 				}
 			}
-			echo "<td style='text-align: center;'>".$commentators[$winners[$i][0]]['score_total']."</td>";
+			echo "<td style='text-align: center;'>".(round(100*$commentators[$winners[$i][0]]['score_total'])/100)."</td>";
 			?>
 			</tr>
 			<?php
@@ -100,6 +103,7 @@ $links_count = count($links);
 ?>
 	</table>
 	<p>В этом сезоне номинировалось комментаторов: <?=count($commentators);?>. Вуху!
+	<p>
 	</center>
 
 </div>
