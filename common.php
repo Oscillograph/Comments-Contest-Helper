@@ -33,6 +33,7 @@ $time_past_season_started = (mktime(0,0,0,intval(date('m')),intval(date('d')),in
 $week_number = 0; // initial value to check if the season started yet
 
 $week_latest = ceil($time_past_season_started / $week_length);
+$week_latest = ($week_latest < 14) ? $week_latest : 14; // prevent week number from going to infinity. TODO: allow to close a season
 
 if (isset($workspace['current_week']))
 {
@@ -55,7 +56,6 @@ if ($week_number > 0)
 	$week_end = $seasons[$workspace['current_season']]['starting_date'] + $week_number*($week_length-1);
 }
 
-$week_number = ($week_number > 14) ? $week_number : 14; // prevent week number from going to infinity. TODO: allow to close a season
 
 
 // = = = = = functions block = = = = =
