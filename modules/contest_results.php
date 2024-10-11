@@ -88,7 +88,7 @@ $links_count = count($links);
 			{
 				if (($j < count($commentators[$winners[$i][0]]['score_weeks'])) && isset($commentators[$winners[$i][0]]['score_weeks'][$j+1]))
 				{
-					echo "<td style='" . (($j < 13) ? "border-right: 1px solid #224488; " : "") . "text-align: center;'>" . $commentators[$winners[$i][0]]['score_weeks'][$j+1] . "</td>";
+					echo "<td style='" . (($j < 13) ? "border-right: 1px solid #224488; " : "") . "text-align: center;'>" . (round(100*$commentators[$winners[$i][0]]['score_weeks'][$j+1])/100) . "</td>";
 				} else {
 					echo "<td style='" . (($j < 13) ? "border-right: 1px solid #224488; " : "") . "text-align: center;'> . </td>";
 				}
