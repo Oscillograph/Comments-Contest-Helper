@@ -207,6 +207,14 @@ if ($step != 4)
 	// save
 	if ($step == 3)
 	{
+		// make sure we overwrite results previously calculated for this week
+		foreach ($commentators as $nickname => $array)
+		{
+			unset($commentators[$nickname]['score_weeks'][$week_number]);
+			$results[$nickname]['score'] = 0;
+		}
+
+		// proceed with saving actual results of this week
 		$commentators_votes_total = [];
 		for ($i = 0; $i < count($commentators_names); ++$i)
 		{

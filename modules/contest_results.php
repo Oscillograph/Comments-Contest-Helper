@@ -62,6 +62,7 @@ $links_count = count($links);
 		}
 
 		$weeks_count = count($array['score_weeks']);
+		$weeks_count = 14; // костыль - устанавливаем максимум недель для цикла, потому что у некоторых комментаторов в массиве score_weeks индексы могут начинаться не с нуля. TODO: исправить
 		$commentators[$nickname]['score_total'] = 0;
 		for ($i = 0; $i < $weeks_count; ++$i)
 		{
@@ -86,7 +87,7 @@ $links_count = count($links);
 			echo "<td style='text-align: center;'>".$winners[$i][0]."</td>";
 			for ($j = 0; $j < 14; ++$j)
 			{
-				if (($j < count($commentators[$winners[$i][0]]['score_weeks'])) && isset($commentators[$winners[$i][0]]['score_weeks'][$j+1]))
+				if (isset($commentators[$winners[$i][0]]['score_weeks'][$j+1]))
 				{
 					echo "<td style='" . (($j < 13) ? "border-right: 1px solid #224488; " : "") . "text-align: center;'>" . (round(100*$commentators[$winners[$i][0]]['score_weeks'][$j+1])/100) . "</td>";
 				} else {
