@@ -28,7 +28,7 @@ if (is_file('./seasons/seasons.txt'))
 
 // prepare timestamps in seconds
 $week_length = (mktime(0,0,0,1,7,2024) - mktime(0,0,0,1,0,2024)); // basically, it's 7 * 86400 seconds
-$time_past_season_started = (mktime(0,0,0,intval(date('m')),intval(date('d')),intval(date('Y'))) - $seasons[$workspace['current_season']]['starting_date']); 
+$time_past_season_started = (mktime(intval(date('H')),intval(date('i')),intval(date('s')),intval(date('m')),intval(date('d')),intval(date('Y'))) - $seasons[$workspace['current_season']]['starting_date']); 
 
 $week_number = 0; // initial value to check if the season started yet
 
