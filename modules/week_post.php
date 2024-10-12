@@ -101,7 +101,7 @@ for ($i = 0; $i < $commentators_count; ++$i)
 		$links_count = count($links[$commentators_names[$i]]);
 		if ($links_count > 0)
 		{
-			$out .= '[b]'.$commentators_names[$i]."[b]\n";
+			$out .= '[b]'.$commentators_names[$i]."[/b]\n";
 			for ($j = 0; $j < $links_count; ++$j)
 			{
 				$out .= $links[$commentators_names[$i]][$j]."\n";
