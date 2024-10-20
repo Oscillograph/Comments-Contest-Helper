@@ -28,7 +28,7 @@ $links_count = count($links);
 	</div>
 
 	<center>
-	<table style='width: 100%'>
+	<table style='width: 100%' cellspacing="0">
 		<tr style='background-color: #224488'>
 			<td rowspan=2 style='vertical-align: middle; text-align: center; width: 15%'>Ник</td>
 			<td colspan=14 style='text-align: center;'>Недели</td>
@@ -84,17 +84,19 @@ $links_count = count($links);
 			<tr onmouseover="javascript: this.style.backgroundColor = '#224466';"
 				onmouseout="javascript: this.style.backgroundColor = '#000000';">
 			<?php
-			echo "<td style='text-align: center;'>".$winners[$i][0]."</td>";
+			echo '<td style=\'text-align: center;\'>'.$winners[$i][0].'</td>';
 			for ($j = 0; $j < 14; ++$j)
 			{
+				echo '<td style=\'' . (($j < 14) ? 'border-left: 1px solid #224488; ' : '') . 'text-align: center;\'>';
 				if (isset($commentators[$winners[$i][0]]['score_weeks'][$j+1]))
 				{
-					echo "<td style='" . (($j < 13) ? "border-right: 1px solid #224488; " : "") . "text-align: center;'>" . (round(100*$commentators[$winners[$i][0]]['score_weeks'][$j+1])/100) . "</td>";
+					 echo (round(100*$commentators[$winners[$i][0]]['score_weeks'][$j+1])/100);
 				} else {
-					echo "<td style='" . (($j < 13) ? "border-right: 1px solid #224488; " : "") . "text-align: center;'> . </td>";
+					echo ' . ';
 				}
+				echo '</td>';
 			}
-			echo "<td style='text-align: center;'>".(round(100*$commentators[$winners[$i][0]]['score_total'])/100)."</td>";
+			echo '<td style=\'border-left: 1px solid #224488; text-align: center;\'>'.(round(100*$commentators[$winners[$i][0]]['score_total'])/100).'</td>';
 			?>
 			</tr>
 			<?php

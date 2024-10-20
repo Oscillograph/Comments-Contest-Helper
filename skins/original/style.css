@@ -16,21 +16,41 @@ a
 	text-align: center;
 	background-color: #446688;
 	color: #ffffff;
+	text-align: left;
 }
 
-#header-table td
+#header-table .item
 {
+	display: inline-block;
 	max-width: 20%;
-	height: 1.5em;
-	vertical-align: middle;
-	text-align: center;
-	font-weight: 700;
 }
 
-#header-table td:hover
+#header-table .item-right
+{
+	float: right;
+}
+
+#header-table .item a, #header-table .item-right a
+{
+	text-decoration: none;
+	font-weight: 700;
+	font-size: 1.25em;
+	color: #ffffff;
+	display: inline-block;
+	background-color: #446688;
+	padding-left: 1em;
+	padding-right: 1em;
+	padding-bottom: 0.25em;
+	padding-top: 0.25em;
+}
+
+#header-table .item a:hover, #header-table .item-right a:hover
 {
 	background-color: #4488aa;
-	cursor: pointer;
+	padding-left: 1em;
+	padding-right: 1em;
+	padding-bottom: 0.25em;
+	padding-top: 0.25em;
 }
 
 #content-table

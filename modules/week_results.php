@@ -99,12 +99,16 @@ if ($step != 4)
 	// add additional votes
 	if ($step == 1)
 	{
+		$results = [];
 		$poll_results = explode("\n", trim($_POST['poll_results']));
 		for ($i = 0; $i < count($poll_results); ++$i)
 		{
 			$commentator_results = explode("\t", $poll_results[$i]);
 			$nickname = trim($commentator_results[0]);
 			$results[$nickname]['votes'] = $commentator_votes = intval(mb_substr(trim($commentator_results[1]), 1));
+			$results[$nickname]['additional_votes'] = 0;
+			$results[$nickname]['votes_total'] = 0;
+			$results[$nickname]['score'] = 0;
 		}
 		file_put_contents("./seasons/".$workspace['current_season']."/".$week_number."-results.txt", serialize($results));
 
@@ -127,16 +131,19 @@ if ($step != 4)
 				Баллы
 			</td>
 		</tr>
+		<tr>
+			<td colspan="5"><hr></td>
+		</tr>
 
 <?php
 		for ($i = 0; $i < count($commentators_names); ++$i)
 		{
-			if (!$commentators[$commentators_names[$i]]['removed'] && isset($links[$commentators_names[$i]]))
+			if (isset($links[$commentators_names[$i]]))
 			{
 				if (count($links[$commentators_names[$i]]) > 0)
 				{
 ?>
-		<tr>
+		<tr<?=(($commentators[$commentators_names[$i]]['removed']) ? ' style="background-color: #882200;"' : '');?>>
 			<td><?=$commentators_names[$i];?></td>
 			<td><?=$results[$commentators_names[$i]]['votes'];?></td>
 			<td><input style='width: 3em;' type="text" name='<?=$i;?>' value='0'></td>
@@ -176,7 +183,12 @@ if ($step != 4)
 				Баллы
 			</td>
 		</tr>
+		<tr>
+			<td colspan="5"><hr></td>
+		</tr>
 <?php
+		$sum1 = 0;
+		$sum2 = 0;
 		for ($i = 0; $i < count($commentators_names); ++$i)
 		{
 			if (isset($_POST[$i]))
@@ -236,7 +248,7 @@ if ($step != 4)
 
 			foreach($results as $nickname => $array)
 			{
-				if (!isset($excluded[$nickname]) && !$commentators[$nickname]['removed'] && isset($array['votes_total']))
+				if (!isset($excluded[$nickname]) && isset($array['votes_total']))
 				{
 					if ($array['votes_total'] > $max)
 					{
@@ -299,15 +311,18 @@ if ($step != 4)
 				Баллы
 			</td>
 		</tr>
+		<tr>
+			<td colspan="5"><hr></td>
+		</tr>
 <?php
 		foreach($results as $nickname => $array)
 		{
-			if (!$commentators[$nickname]['removed'] && isset($array['score']))
+			if (isset($array['score']))
 			{
 				if ($array['score'] > 0)
 				{
 ?>
-		<tr>
+		<tr<?=(($commentators[$commentators_names[$i]]['removed']) ? ' style="background-color: #882200;"' : '');?>>
 			<td><?=$nickname;?></td>
 			<td><?=$results[$nickname]['votes'];?></td>
 			<td><?=$results[$nickname]['additional_votes'];?></td>
@@ -338,7 +353,7 @@ if ($step != 4)
 } else {
 	// step 4 - view
 ?>
-	<table>
+	<table cellspacing="0" style='text-align: center'>
 		<tr>
 			<td>
 				Ник
@@ -356,15 +371,18 @@ if ($step != 4)
 				Баллы
 			</td>
 		</tr>
+		<tr>
+			<td colspan="5"><hr></td>
+		</tr>
 <?php
 		// array of commentators who won any score of the week
 		$winners = [];
 
 		foreach($results as $nickname => $array)
 		{
-			if (!$commentators[$nickname]['removed'] && isset($array['votes_total']) && isset($array['score']))
+			if (isset($array['votes_total']) && isset($array['score']))
 			{
-				if (($array['votes_total'] > 0) && ($array['score'] > 0))
+				// if (($array['votes_total'] > 0) && ($array['score'] > 0))
 				{
 					$winners[] = [$nickname, $array['votes_total']];
 				}
@@ -378,7 +396,8 @@ if ($step != 4)
 		{
 			$nickname = $winners[$i][0];
 ?>
-		<tr>
+		<tr<?=(($commentators[$nickname]['removed']) ? ' style="background-color: #882200;"' : '');?>
+		 <?=($results[$nickname]['score'] > 0) ? ' style="background-color:#113311;"' : '';?>>
 			<td><?=$nickname;?></td>
 			<td><?=$results[$nickname]['votes'];?></td>
 			<td><?=$results[$nickname]['additional_votes'];?></td>
@@ -389,6 +408,46 @@ if ($step != 4)
 		}
 ?>
 
+		<tr>
+			<td colspan="5"><hr></td>
+		</tr>
+		<tr>
+			<td>Всего:</td>
+			<td><?
+				$sum = 0;
+				foreach ($results as $nickname => $array) {
+					if (isset($array['votes']))
+					{
+						$sum += intval($array['votes']);
+					}
+				}
+				echo $sum;
+			?></td>
+			<td><?
+				$sum = 0;
+				foreach ($results as $nickname => $array) {
+					if (isset($array['additional_votes']))
+						$sum += intval($array['additional_votes']);
+				}
+				echo $sum;
+			?></td>
+			<td><?
+				$sum = 0;
+				foreach ($results as $nickname => $array) {
+					if (isset($array['votes_total']))
+						$sum += intval($array['votes_total']);
+				}
+				echo $sum;
+			?></td>
+			<td><?
+				$sum = 0;
+				foreach ($results as $nickname => $array) {
+					if (isset($array['score']))
+						$sum += $array['score'];
+				}
+				echo $sum;
+			?></td>
+		</tr>
 	</table>
 	<input type="submit" class="input-button green" value="Посчитать заново" onClick="javascript: document.getElementById('step').setAttribute('value', '0');">
 
