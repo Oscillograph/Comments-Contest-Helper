@@ -46,7 +46,8 @@ if(isset($_POST['season_select']))
 		{
 			$workspace['current_season'] = $_POST['season_select'];
 			$workspace['current_week'] = 0;
-			file_put_contents('./seasons/workspace.txt', serialize($workspace));
+			$_SESSION['current_season'] = $workspace['current_season'];
+			$_SESSION['current_week'] = $workspace['current_week'];
 		}
 	}
 }

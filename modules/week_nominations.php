@@ -223,7 +223,7 @@ if(isset($_POST['todo']))
 			<tr onmouseover="javascript: this.childNodes[1].style.backgroundColor = '#446688';"
 				onmouseout="javascript: this.childNodes[1].style.backgroundColor = '#000000';">
 				<td style='width: 200px; border-right: 1px solid #446688;'>
-					<div style="margin-top: 0.25em; margin-left: 0.25em"> <?=$commentators_names[$commentator];?> </div>
+					<div id="<?=$commentators_names[$commentator];?>" style="margin-top: 0.25em; margin-left: 0.25em"><a href='#<?=$commentators_names[$commentator];?>'><?=$commentators_names[$commentator];?></a></div>
 
 					<br>
 					<div style="margin-top: 0.25em; margin-left: 0.25em">
@@ -233,7 +233,7 @@ if(isset($_POST['todo']))
 							// echo 'Не номинируется с ' . date('d.m.Y', $commentators[$commentators_names[$commentator]]['removed_date']);
 						} else {
 					?>
-						<input class="input-button red" type="submit" name="remove" value="Снять" onClick="javascript: if(confirm('Этот комментатор слёзно просит его не номинировать?')) { document.getElementById('todo').setAttribute('value', 'remove'); document.getElementById('nickname').setAttribute('value', '<?=$commentators_names[$commentator];?>'); } else { return false; }; ">
+						<input class="input-button red" type="button" name="remove" value="Снять" onClick="form_submitter('remove', '<?=$commentators_names[$commentator];?>');">
 					</div>
 					<?php
 						}
@@ -255,8 +255,8 @@ if(isset($_POST['todo']))
 						onmouseout="javascript: this.style.backgroundColor = '#000000';">
 						<a href="<?=$links[$commentators_names[$commentator]][$link];?>" target="_blank"> <?=$links[$commentators_names[$commentator]][$link];?> </a>
 						<div style="float: right;">
-							<input class="input-button" type="submit" name="edit" value="Править" onClick="javascript: document.getElementById('todo').setAttribute('value', 'edit'); document.getElementById('var1').setAttribute('value', '<?=$commentators_names[$commentator];?>'); document.getElementById('var2').setAttribute('value', <?=$link;?>); var url=prompt('Введите адрес ссылки:', ''); if (!url) { return false; }; document.getElementById('var3').setAttribute('value', url);">
-							<input class="input-button red" type="submit" name="delete" value="Удалить" onClick="javascript: if(confirm('Удалить эту ссылку?')) { document.getElementById('todo').setAttribute('value', 'delete'); document.getElementById('var1').setAttribute('value', '<?=$commentators_names[$commentator];?>'); document.getElementById('var2').setAttribute('value', '<?=$link;?>'); } else { return false; };">
+							<input class="input-button" type="button" name="edit" value="Править" onClick="form_submitter('edit', '<?=$commentators_names[$commentator];?>', <?=$link;?>);">
+							<input class="input-button red" type="button" name="delete" value="Удалить" onClick="form_submitter('delete', '<?=$commentators_names[$commentator];?>', <?=$link;?>);">
 						</div>						
 					</div>
 					<?php
@@ -272,12 +272,12 @@ if(isset($_POST['todo']))
 							{
 								echo 'Снят с Конкурса Комментариев ' . date('d.m.Y', $commentators[$commentators_names[$commentator]]['removed_date']);
 						?>
-						<input class="input-button green" type="submit" name="bring_back" value="Вернуть" onClick="javascript: if(confirm('Но ведь комментатор слёзно просит не номинировать!')) { document.getElementById('todo').setAttribute('value', 'bring_back'); document.getElementById('nickname').setAttribute('value', '<?=$commentators_names[$commentator];?>'); } else { return false; }; ">
+						<input class="input-button green" type="button" name="bring_back" value="Вернуть" onClick="form_submitter('bring_back', '<?=$commentators_names[$commentator];?>');">
 						<?php
 							} else {
 						?>
 						<br>
-						<input class="input-button" type="submit" name="new" value="Добавить ссылку" onClick="javascript: document.getElementById('todo').setAttribute('value', 'add'); document.getElementById('nickname').setAttribute('value', '<?=$commentators_names[$commentator];?>'); var url=prompt('Введите адрес ссылки:', ''); if (!url) { return false; }; document.getElementById('url').setAttribute('value', url);">
+						<input class="input-button" type="button" name="new" value="Добавить ссылку" onClick="form_submitter('add', '<?=$commentators_names[$commentator];?>');">
 						<?php
 							}
 						?>
@@ -303,3 +303,78 @@ if(isset($_POST['todo']))
 	<input type="hidden" name="var2" id="var2" value="">
 	<input type="hidden" name="var3" id="var3" value="">
 </form>
+
+<script>
+function form_submitter(todo, var1, var2, var3)
+{
+	theForm = document.getElementById('theForm');
+	theForm.setAttribute('action', theForm.getAttribute('action') + '#' + var1);
+	switch (todo)
+	{
+		// links
+		case 'add': // var1 = nickname
+		{
+			document.getElementById('todo').setAttribute('value', 'add'); 
+			document.getElementById('nickname').setAttribute('value', var1); 
+			var url=prompt(var1 + ': введите адрес ссылки:', ''); 
+			if (!url) return false;
+			document.getElementById('url').setAttribute('value', url);
+			theForm.submit();
+			break;
+		}
+		case 'edit': // var1 = nickname; var2 = link id
+		{
+			document.getElementById('todo').setAttribute('value', 'edit'); 
+			document.getElementById('var1').setAttribute('value', var1);
+			document.getElementById('var2').setAttribute('value', var2); 
+			var url=prompt(var1 + ': ведите адрес ссылки:', ''); 
+			if (!url) return false; 
+			document.getElementById('var3').setAttribute('value', url);
+			theForm.submit();
+			break;
+		}
+		case 'delete': // var1 = nickname, var2 = link id
+		{
+			if(confirm(var1 + ': удалить эту ссылку?'))
+			{
+				document.getElementById('todo').setAttribute('value', 'delete'); 
+				document.getElementById('var1').setAttribute('value', var1);
+				document.getElementById('var2').setAttribute('value', var2);
+			} else { 
+				return false; 
+			}
+			theForm.submit();
+			break;
+		}
+
+		// commentators
+		case 'remove': // var1 = nickname
+		{
+			if (confirm(var1 + ' слёзно просит не номинировать?'))
+			{
+				document.getElementById('todo').setAttribute('value', 'remove'); 
+				document.getElementById('nickname').setAttribute('value', var1); 
+			} else { 
+				return false; 
+			}
+			theForm.submit();
+			break;
+		}
+		case 'bring_back': // var1 = nickname
+		{
+			if(confirm('Но ведь ' + var1 + ' слёзно просит не номинировать!'))
+			{ 
+				document.getElementById('todo').setAttribute('value', 'bring_back');
+				document.getElementById('nickname').setAttribute('value', var1);
+			} else {
+				return false;
+			}
+			theForm.submit();
+			return true;
+
+			break;
+		}
+	}
+	return false;
+}
+</script>

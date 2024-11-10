@@ -12,12 +12,24 @@ $commentators_names = [];
 // A commentator's nickname is used as a key.
 $links = [];
 
-// workspace is a structure of variables: 'current_season', 'urrent_week'
+// workspace is a structure of variables: 'current_season', 'current_week'
 $workspace = [];
-if (is_file('./seasons/workspace.txt'))
+if (isset($_SESSION['current_season']))
 {
-	$workspace = unserialize(file_get_contents('./seasons/workspace.txt'));
+	$workspace['current_season'] = $_SESSION['current_season'];
+} else {
+	$workspace['current_season'] = 'none';
 }
+if (isset($_SESSION['current_week']))
+{
+	$workspace['current_week'] = $_SESSION['current_week'];
+} else {
+	$workspace['current_week'] = 0;
+}
+//if (is_file('./seasons/workspace.txt'))
+//{
+//	$workspace = unserialize(file_get_contents('./seasons/workspace.txt'));
+//}
 
 // $seasons is an unordered map of structures with fields 'name' and 'starting_date'
 $seasons = [];
@@ -28,32 +40,41 @@ if (is_file('./seasons/seasons.txt'))
 
 // prepare timestamps in seconds
 $week_length = (mktime(0,0,0,1,7,2024) - mktime(0,0,0,1,0,2024)); // basically, it's 7 * 86400 seconds
-$time_past_season_started = (mktime(intval(date('H')),intval(date('i')),intval(date('s')),intval(date('m')),intval(date('d')),intval(date('Y'))) - $seasons[$workspace['current_season']]['starting_date']); 
+$time_past_season_started = 0;
+$week_number = 0;
+$week_latest = 1;
+$week_start = 0;
+$week_end = 0;
 
-$week_number = 0; // initial value to check if the season started yet
-
-$week_latest = ceil($time_past_season_started / $week_length);
-$week_latest = ($week_latest < 14) ? $week_latest : 14; // prevent week number from going to infinity. TODO: allow to close a season
-
-if (isset($workspace['current_week']))
+if ($workspace['current_season'] !== 'none')
 {
-	if (intval($workspace['current_week']) > 0)
+	$time_past_season_started = (mktime(intval(date('H')),intval(date('i')),intval(date('s')),intval(date('m')),intval(date('d')),intval(date('Y'))) - $seasons[$workspace['current_season']]['starting_date']); 
+
+	$week_number = 0; // initial value to check if the season started yet
+
+	$week_latest = ceil($time_past_season_started / $week_length);
+	$week_latest = ($week_latest < 14) ? $week_latest : 14; // prevent week number from going to infinity. TODO: allow to close a season
+
+	if (isset($workspace['current_week']))
 	{
-		$week_number = intval($workspace['current_week']);
+		if (intval($workspace['current_week']) > 0)
+		{
+			$week_number = intval($workspace['current_week']);
+		} else {
+			$week_number = $week_latest;
+		}
 	} else {
 		$week_number = $week_latest;
 	}
-} else {
-	$week_number = $week_latest;
-}
 
-$week_start = $seasons[$workspace['current_season']]['starting_date']; // starting with the season
-$week_end = $week_start + $week_length - 1; // ending in seven days
+	$week_start = $seasons[$workspace['current_season']]['starting_date']; // starting with the season
+	$week_end = $week_start + $week_length - 1; // ending in seven days
 
-if ($week_number > 0)
-{
-	$week_start = $seasons[$workspace['current_season']]['starting_date'] + ($week_number - 1)*$week_length;
-	$week_end = $seasons[$workspace['current_season']]['starting_date'] + $week_number*($week_length-1);
+	if ($week_number > 0)
+	{
+		$week_start = $seasons[$workspace['current_season']]['starting_date'] + ($week_number - 1)*$week_length;
+		$week_end = $seasons[$workspace['current_season']]['starting_date'] + $week_number*($week_length-1);
+	}
 }
 
 

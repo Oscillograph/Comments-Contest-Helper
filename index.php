@@ -1,5 +1,7 @@
 <?php
 
+session_start();
+
 include './config.php';
 include './common.php';
 include './auth.php'; 

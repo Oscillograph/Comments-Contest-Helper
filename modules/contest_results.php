@@ -102,10 +102,150 @@ $links_count = count($links);
 			<?php
 		}
 	}
-
 ?>
 	</table>
-	<p>В этом сезоне номинировалось комментаторов: <?=count($commentators);?>. Вуху!
+	</center>
+</div>
+
+<?php
+
+// collect stats
+$comments_total = 0;
+$votes_total = 0;
+$commentators_stats = []; // key - nickname; value = array('comments'=>, 'votes'=>)
+$most_comments = [];
+$most_comments[0] = array(
+	'nickname'	=>	'',
+	'total'		=>	0
+);
+$most_votes = [];
+$most_votes[0] = array(
+	'nickname'	=>	'',
+	'total'		=>	0
+);
+
+for ($i = 0; $i < 14; ++$i)
+{
+	if (is_file("./seasons/".$workspace['current_season']."/".$i."-links.txt"))
+	{
+		$links = unserialize(file_get_contents("./seasons/".$workspace['current_season']."/".$i."-links.txt"));
+
+		foreach($links as $key => $value)
+		{
+			$comments_total += count($value);
+			if (isset($commentators_stats[$key]['comments']))
+			{
+				$commentators_stats[$key]['comments'] += count($value);
+			} else {
+				$commentators_stats[$key]['comments'] = count($value);
+			}
+		}
+
+		foreach($commentators_stats as $key => $value)
+		{
+			if (isset($commentators_stats[$key]['comments']))
+			{
+				if ($commentators_stats[$key]['comments'] > $most_comments[0]['total'])
+				{
+					$most_comments = array();
+					$most_comments[0]['nickname'] = $key;
+					$most_comments[0]['total'] = $commentators_stats[$key]['comments'];
+				}
+
+				if ($commentators_stats[$key]['comments'] == $most_comments[0]['total'])
+				{
+					$commentator_is_counted = false;
+					for ($j = 0; $j < count($most_comments); ++$j)
+					{
+						if ($key === $most_comments[$j]['nickname'])
+						{
+							$commentator_is_counted = true;
+						}
+					}
+					if (!$commentator_is_counted)
+					{
+						$next = count($most_comments);
+						$most_comments[$next]['nickname'] = $key;
+						$most_comments[$next]['total'] = $commentators_stats[$key]['comments'];
+					}
+				}
+			}
+		}
+	}
+
+	if (is_file("./seasons/".$workspace['current_season']."/".$i."-results.txt"))
+	{
+		$results = unserialize(file_get_contents("./seasons/".$workspace['current_season']."/".$i."-results.txt"));
+
+		foreach($results as $key => $value)
+		{
+			if (isset($value['votes_total']))
+			{
+				$votes_total += $value['votes_total'];
+			}
+
+			if (isset($results[$key]['votes_total']))
+			{
+				if (isset($commentators_stats[$key]['votes']))
+				{
+					$commentators_stats[$key]['votes'] += $results[$key]['votes_total'];
+				} else {
+					$commentators_stats[$key]['votes'] = $results[$key]['votes_total'];
+				}
+			} else {
+				$commentators_stats[$key]['votes'] = 0;
+			}
+		}
+
+		foreach($commentators_stats as $key => $value)
+		{
+			if ($commentators_stats[$key]['votes'] > $most_votes[0]['total'])
+			{
+				$most_votes = array();
+				$most_votes[0]['nickname'] = $key;
+				$most_votes[0]['total'] = $commentators_stats[$key]['votes'];
+			}
+
+			if ($commentators_stats[$key]['votes'] == $most_votes[0]['total'])
+			{
+				$commentator_is_counted = false;
+				for ($j = 0; $j < count($most_votes); ++$j)
+				{
+					if ($key === $most_votes[$j]['nickname'])
+					{
+						$commentator_is_counted = true;
+					}
+				}
+				if (!$commentator_is_counted)
+				{
+					$next = count($most_votes);
+					$most_votes[$next]['nickname'] = $key;
+					$most_votes[$next]['total'] = $commentators_stats[$key]['votes'];
+				}
+			}
+		}
+	}
+}
+
+?>
+
+&nbsp;<br>
+
+<div class='gbox'>
+	<div class='header'>
+		Статистика сезона
+	</div>
+	<center>
+	<p>Участников конкурса комментариев: <?=count($commentators);?><br>
+	Номинировалось комментариев: <?=$comments_total;?><br>
+	Отдано голосов: <?=$votes_total;?><br>
+	Самый номинируемый комментатор: <?php
+	for ($i = 0; $i < count($most_comments); ++$i)
+	{
+		echo '<b>'.$most_comments[$i]['nickname'].'</b> (комментариев: ' . $most_comments[$i]['total']. ')' . (($i == (count($most_comments) - 1)) ? '' : ', ');
+	}
+	?><br>
+	Самый любимый комментатор: <b><?=$most_votes[0]['nickname'];?></b> (всего голосов: <?=$most_votes[0]['total'];?>)
 	<p>
 	</center>
 

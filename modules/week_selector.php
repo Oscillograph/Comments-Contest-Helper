@@ -6,7 +6,7 @@
 		{
 			$select_week = $_POST['select_week'];
 			$workspace['current_week'] = intval($select_week);
-			file_put_contents('./seasons/workspace.txt', serialize($workspace));
+			$_SESSION['current_week'] = $workspace['current_week'];
 			
 			$week_number = intval($workspace['current_week']);
 			$week_start = $seasons[$workspace['current_season']]['starting_date'] + ($week_number - 1)*$week_length;
