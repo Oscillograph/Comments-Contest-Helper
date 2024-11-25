@@ -1,5 +1,4 @@
-<?php if (!defined('CCH')) die('Этот скрипт не может работать самостоятельно.'); 
-$html['title'] = 'Настройки'; ?>
+<?php if (!defined('CCH')) die('Этот скрипт не может работать самостоятельно.'); ?>
 
 <?if(authorized()):?>
 <table id='content-table'>
