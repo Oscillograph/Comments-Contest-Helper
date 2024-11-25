@@ -2,55 +2,13 @@ body
 {
 	background-color: #000000;
 	color: #ffffff;
+	font-size: 1em;
 }
 
 a
 {
 	text-decoration: underline;
 	color: #ffff00;
-}
-
-#header-table
-{
-	width: 100%;
-	text-align: center;
-	background-color: #446688;
-	color: #ffffff;
-	text-align: left;
-}
-
-#header-table .item
-{
-	display: inline-block;
-	max-width: 20%;
-}
-
-#header-table .item-right
-{
-	float: right;
-}
-
-#header-table .item a, #header-table .item-right a
-{
-	text-decoration: none;
-	font-weight: 700;
-	font-size: 1.25em;
-	color: #ffffff;
-	display: inline-block;
-	background-color: #446688;
-	padding-left: 1em;
-	padding-right: 1em;
-	padding-bottom: 0.25em;
-	padding-top: 0.25em;
-}
-
-#header-table .item a:hover, #header-table .item-right a:hover
-{
-	background-color: #4488aa;
-	padding-left: 1em;
-	padding-right: 1em;
-	padding-bottom: 0.25em;
-	padding-top: 0.25em;
 }
 
 #content-table
@@ -136,4 +94,74 @@ a
 .green
 {
 	background-color: #448822;
+}
+
+.yellow
+{
+	background-color: #888822;
+}
+
+/* menus */
+.headbar {
+	text-align: left;
+	width: 100%;
+	border: 1px solid black;
+	background-color: #446688;
+}
+
+.headbar a {
+	padding: 0.5em 1em;
+	font-size: 1em;
+	color: #ffffff;
+	text-decoration: none;
+	font-weight: 700;
+}
+
+.headbar a:hover {
+	background-color: #4488aa;
+}
+
+.mainmenu {
+	list-style-type: none;
+	list-style-position: inside;
+	padding: 0em;
+	display: inline;
+}
+
+.mainmenu-right {
+	float: right;
+}
+
+.mainmenu .nav-item, .nav-item a {
+	display: inline-block;
+}
+
+.nav-item .submenu, .nav-item .submenu2 {
+	padding: 0em;
+	list-style-type: none;
+	list-style-position: inside;
+	position: absolute;
+	background-color: #446688;
+	min-width: 200px;
+	display: none;
+}
+
+.submenu .nav-item, .submenu2 .nav-item {
+	display: block;
+}
+
+.nav-item:hover .submenu {
+	display: block;
+}
+
+.submenu a {
+	min-width: 200px;
+}
+
+.submenu .nav-item:hover .submenu2 {
+	display: inline-block;
+}
+
+.submenu .nav-item:hover .submenu2 a {
+	display: block;
 }

@@ -1,36 +1,66 @@
 <?php
 
-session_start();
+// session_start();
 
-function logged_in()
+$logged_in = false;
+
+function authorized()
 {
-	global $admin_login;
-	global $admin_password;
-
-	if (isset($_SESSION['login']))
+	if (isset($_SESSION['userid']))
 	{
-		return true;
-	} else {
-		if (isset($_POST['login']) && isset($_POST['password']))
-		{
-			$login = $_POST['login'];
-			$password = $_POST['password'];
-
-			if ($login == $admin_login)
-			{
-				if ($password == $admin_password)
-				{
-					$_SESSION['login'] = 'login';
-					return true;
-				} else {
-					echo '<div class="red">Ошибка: неверный пароль!</div>';
-				}
-			} else {
-				echo '<div class="red">Ошибка: неверный логин!</div>';
-			}
-		}
+		if ($_SESSION['userid'] >= 0)
+			return true;
 	}
 	return false;
+}
+
+function login()
+{
+	global $config;
+	global $users;
+
+	$login = get_var('login');
+	$password = get_var('password');
+	$register = $config['open_registration'] ? get_var('register') : false;
+
+	if ($login && $password)
+	{
+		if ($register)
+		{
+			register_new_user($login, $password);
+		}
+
+		if (($login == $config['admin_login']) && ($password == $config['admin_password']))
+		{
+			$_SESSION['userid'] = 0;
+			$_SESSION['group'] = 'admin';
+			return true;
+		} elseif (($login == $config['admin_login']) || ($password == $config['admin_password'])) {
+			error_message($config['admin_login'] . ' ' . $config['admin_password']);
+			error_message($login . ' ' . $password);
+			error_message('Неверный логин или пароль!');
+			return false;
+		}
+
+		for ($i = 0; $i < count($users); ++$i)
+		{
+			if (($login == $users[$i]['login']) && ($password == $users[$i]['password']))
+			{
+				$_SESSION['userid'] = $i;
+				$_SESSION['group'] = 'user';
+				return true;
+			} elseif (($login == $users[$i]['login']) || ($password == $users[$i]['password'])) {
+				error_message('Неверный логин или пароль!');
+				return false;
+			}
+		}
+
+		return false;
+	} else {
+		$_SESSION['userid'] = -1;
+		$_SESSION['group'] = 'guest';
+		return false;
+	}
 }
 
 function login_form()
@@ -59,14 +89,6 @@ function logout()
 {
 	unset($_SESSION['login']);
 	session_destroy();
-
-?>
-		<div class='gbox'>
-			<center>
-				Вы вышли.
-			</center>
-		</div>
-<?php
 }
 
 ?>

@@ -1,4 +1,40 @@
 <?php
+if (!defined('CCH')) die('Этот скрипт не может работать самостоятельно.');
+
+// Load config
+$config = load_array('./data/config.php'); // contains admin_login and admin_password among other things
+if (!$config)
+{
+	$config = [];
+	$config['admin_login'] = 'Admin';
+	$config['admin_password'] = 'Password123';
+	$config['admin_password_reset'] = true;
+	$config['open_registration'] = false;
+	$config['skin'] = 'original';
+	$config['current_season'] = 'opf-2024'; // or 'none'
+	save_array('./data/config.php', $config);
+}
+
+// Load registered users
+// $users is an array of unordered maps consisting of fields: 'login', 'password', 'group', 'seasons'
+// groups are: 'admin', 'user', 'guest'
+$users = load_array('./data/users.php');
+if (!$users)
+{
+	$users = [];
+
+	$users[0]['login'] = $config['admin_login'];
+	$users[0]['password'] = $config['admin_password'];
+	$users[0]['group'] = 'admin';
+	$users[0]['seasons'] = [];
+
+	save_array('./data/users.php', $users);
+}
+
+// Current user associative array
+$user = [];
+$season_master = false; // set to true if the user is allowed to administer the season
+
 
 // $commentators is an unordered map of structures with fields 'score_weeks', 'score_total', 'removed' and 'removed_date'.
 // A commentator's nickname is used as a key.
@@ -12,72 +48,11 @@ $commentators_names = [];
 // A commentator's nickname is used as a key.
 $links = [];
 
-// workspace is a structure of variables: 'current_season', 'current_week'
-$workspace = [];
-if (isset($_SESSION['current_season']))
-{
-	$workspace['current_season'] = $_SESSION['current_season'];
-} else {
-	$workspace['current_season'] = 'none';
-}
-if (isset($_SESSION['current_week']))
-{
-	$workspace['current_week'] = $_SESSION['current_week'];
-} else {
-	$workspace['current_week'] = 0;
-}
-//if (is_file('./seasons/workspace.txt'))
-//{
-//	$workspace = unserialize(file_get_contents('./seasons/workspace.txt'));
-//}
-
 // $seasons is an unordered map of structures with fields 'name' and 'starting_date'
 $seasons = [];
-if (is_file('./seasons/seasons.txt'))
-{
-	$seasons = unserialize(file_get_contents('./seasons/seasons.txt'));
-}
 
-// prepare timestamps in seconds
-$week_length = (mktime(0,0,0,1,7,2024) - mktime(0,0,0,1,0,2024)); // basically, it's 7 * 86400 seconds
-$time_past_season_started = 0;
-$week_number = 0;
-$week_latest = 1;
-$week_start = 0;
-$week_end = 0;
-
-if ($workspace['current_season'] !== 'none')
-{
-	$time_past_season_started = (mktime(intval(date('H')),intval(date('i')),intval(date('s')),intval(date('m')),intval(date('d')),intval(date('Y'))) - $seasons[$workspace['current_season']]['starting_date']); 
-
-	$week_number = 0; // initial value to check if the season started yet
-
-	$week_latest = ceil($time_past_season_started / $week_length);
-	$week_latest = ($week_latest < 14) ? $week_latest : 14; // prevent week number from going to infinity. TODO: allow to close a season
-
-	if (isset($workspace['current_week']))
-	{
-		if (intval($workspace['current_week']) > 0)
-		{
-			$week_number = intval($workspace['current_week']);
-		} else {
-			$week_number = $week_latest;
-		}
-	} else {
-		$week_number = $week_latest;
-	}
-
-	$week_start = $seasons[$workspace['current_season']]['starting_date']; // starting with the season
-	$week_end = $week_start + $week_length - 1; // ending in seven days
-
-	if ($week_number > 0)
-	{
-		$week_start = $seasons[$workspace['current_season']]['starting_date'] + ($week_number - 1)*$week_length;
-		$week_end = $seasons[$workspace['current_season']]['starting_date'] + $week_number*($week_length-1);
-	}
-}
-
-
+// workspace is a structure of variables: 'current_season', 'current_week'
+$workspace = [];
 
 // = = = = = functions block = = = = =
 // proudly heavily based on sectus' edit of Jaison Erick's answer on https://stackoverflow.com/questions/7929796/how-can-i-sort-an-array-of-utf-8-strings-in-php
@@ -146,4 +121,215 @@ function sort_winners(&$array)
 			return 1;
 	});
 }
+
+function error_message($text)
+{
+	global $html;
+	$html['error'] .= '<div class="red">Ошибка: ' . $text .'</div>';
+}
+
+function trace_message($text)
+{
+	global $html;
+	$html['error'] .= '<div class="yellow">Сообщение: ' . $text .'</div>';
+}
+
+function success_message($text)
+{
+	global $html;
+	$html['error'] .= '<div class="green">Сообщение: ' . $text .'</div>';
+}
+
+// there is a chance i would consider storing variables in a different manner, so it could be useful to have these two functions
+function get_var($name)
+{
+	if (isset($_POST[$name]))
+		return $_POST[$name];
+
+	if (isset($_GET[$name]))
+		return $_GET[$name];
+
+	return false;
+}
+
+function get_session_var($name)
+{
+	if (isset($_SESSION[$name]))
+		return $_SESSION[$name];
+
+	return false;
+}
+
+//
+function render($template)
+{
+	// system globals
+	global $mode, $section, $userid, $season, $week;
+	global $config, $users, $user, $season_master, $workspace, $html;
+
+	// page globals
+	global $commentators, $commentators_names, $commentators_count, $links, $links_count, $seasons, $values; // many pages
+	global $week_selector_form_action, $week_start, $week_end, $week_latest, $week_number; // week_selection
+	global $week_start_day, $week_end_day, $week_start_month, $week_end_month, $week_start_year, $week_end_year, $months; // week_post
+	global $results, $step; // week_results
+
+	ob_start();
+	include './skins/'.$config['skin'].'/'.$template.'.html.php';
+	return ob_get_clean();
+}
+
+function load_array($file)
+{
+	if (file_exists($file))
+	{
+		return unserialize(mb_substr(file_get_contents($file), 14, null, mb_internal_encoding()));
+	} else {
+		return false;
+	}
+}
+
+function load_array_old($file)
+{
+	if (file_exists($file))
+	{
+		return unserialize(file_get_contents($file));
+	} else {
+		return false;
+	}
+}
+
+function save_array($file, &$array)
+{
+	file_put_contents($file, '<?php die();?>'.serialize($array));
+}
+
+function load_commentators_and_links()
+{
+	global $commentators, $links, $commentators_names, $commentators_count, $links_count, $workspace, $week_number;
+
+	// load commentators and links to comments
+	$commentators = load_array_old('./data/seasons/'.$workspace['current_season'].'/commentators.php');
+	if (!$commentators)
+	{
+		$commentators = load_array("./data/seasons/".$workspace['current_season']."/commentators.php");
+	}
+
+	// count how many commentators we have this season
+	$commentators_count = 0;
+	if ($commentators)
+	{
+		$commentators_count = count($commentators);
+	}
+
+	// sort commentators' names and store their sorted order
+	if ($commentators_count > 0)
+	{
+		foreach ($commentators as $key => $value)
+		{
+			$commentators_names[] = $key;
+		}
+		mb_sort($commentators_names);
+	}
+
+	$links = load_array_old('./data/seasons/'.$workspace['current_season'].'/'.$week_number.'-links.php');
+	if(!$links)
+	{
+		$links = load_array('./data/seasons/'.$workspace['current_season'].'/'.$week_number.'-links.php');
+	}
+
+	// no links added on this week!
+	if (!$links && ($week_number > 0))
+	{
+		$links = [];
+		save_array('./data/seasons/'.$workspace['current_season'].'/'.$week_number.'-links.php', $links);
+	}
+
+	// count how many links were nominated this week
+	if ($links)
+	{
+		$links_count = count($links);
+	} else {
+		$links_count = 0;
+	}
+}
+
+function locate_old_format_and_upgrade()
+{
+	$files = scandir(CCH_BASE_DIR . '/data/seasons');
+	foreach($files as $file)
+	{
+		if (is_dir(CCH_BASE_DIR . '/data/seasons/' . $file) && ($file != '..') && ($file != '.') && ($file != 'trash'))
+		{
+			// Old way of updating database files to the new format
+			$commentators = load_array_old('./data/seasons/'.$file.'/commentators.txt');
+			if ($commentators)
+			{
+				foreach($commentators as $key => $value)
+				{
+					if (!isset($commentators[$key]['score_weeks']))
+						$commentators[$key]['score_weeks'] = 0;
+					if (!isset($commentators[$key]['score_total']))
+						$commentators[$key]['score_total'] = 0;
+					if (!isset($commentators[$key]['removed']))
+						$commentators[$key]['removed'] = false;
+					if (!isset($commentators[$key]['removed_date']))
+						$commentators[$key]['removed_date'] = 0;
+				}
+				save_array('./data/seasons/'.$file.'/commentators.php', $commentators);
+			}
+
+			for ($i = 1; $i < 50; ++$i)
+			{
+				$links = load_array_old('./data/seasons/'.$file.'/'.$i.'-links.txt');
+				if ($links)
+				{
+					save_array('./data/seasons/'.$file.'/'.$i.'-links.php', $links);
+				}
+
+				$results = load_array_old('./data/seasons/'.$file.'/'.$i.'-results.txt');
+				if ($results)
+				{
+					foreach($results as $key => $value)
+					{
+						/*
+						if (!isset($results[$key]['votes']))
+							$results[$key]['votes'] = -1;
+						if (!isset($results[$key]['additional_votes']))
+							$results[$key]['additional_votes'] = 0;
+						if (!isset($results[$key]['votes_total']))
+							$results[$key]['votes_total'] = 0;
+						if (!isset($results[$key]['score']))
+							$results[$key]['score'] = 0;
+						*/
+					}
+					save_array('./data/seasons/'.$file.'/'.$i.'-results.php', $results);
+				}
+			}
+		}
+	}
+}
+
+function register_new_user(&$login, &$password)
+{
+	global $users;
+
+	for ($i = 0; $i < count($users); ++$i)
+	{
+		if ($users[$i]['login'] == $login)
+		{
+			error_message('Пользователь с таким ником уже существует! В регистрации отказано.');
+			return false;
+		}
+	}
+
+	$users[] = array(
+		'login'		=>	$login,
+		'password'	=>	$password,
+		'group'		=>	'user',
+		'seasons'	=> []
+		);
+	save_array('./data/users.php', $users);
+	success_message('Пользователь с ником "'.$login.'" успешно зарегистрирован.');
+}
+
 ?>

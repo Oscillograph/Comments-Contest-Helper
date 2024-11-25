@@ -1,185 +1,8 @@
-<?php
+<?php if (!defined('CCH')) die('Этот скрипт не может работать самостоятельно.'); ?>
 
-// load commentators and links to comments
-if (is_file("./seasons/".$workspace['current_season']."/commentators.txt"))
-{
-	$commentators = unserialize(file_get_contents("./seasons/".$workspace['current_season']."/commentators.txt"));
-	foreach ($commentators as $key => $value)
-	{
-		$commentators_names[] = $key;
-	}
-	mb_sort($commentators_names); // to display in alphabetic order
-}
-if (is_file("./seasons/".$workspace['current_season']."/".$week_number."-links.txt"))
-{
-	$links = unserialize(file_get_contents("./seasons/".$workspace['current_season']."/".$week_number."-links.txt"));
-}
-
-// count how many commentators we have this season
-$commentators_count = count($commentators_names);
-// count how many links were nominated this week
-$links_count = count($links);
-
-// process forms
-if(isset($_POST['todo']))
-{
-	// nominate a new comment
-	if($_POST['todo'] == 'add')
-	{
-		if (isset($_POST['nickname']))
-		{
-			$nickname = trim($_POST['nickname']);
-			$url = trim($_POST['url']);
-
-			if (strlen($nickname) > 0)
-			{
-				// if the commentator is new - book'im
-				if (!isset($commentators[$nickname]))
-				{
-					$commentators[$nickname]['score_weeks'] = [];
-					$commentators[$nickname]['score_total'] = 0;
-					$commentators[$nickname]['removed'] = false;
-					$commentators[$nickname]['removed_date'] = $seasons[$workspace['current_season']]['starting_date'];
-					$commentators_names[] = $nickname;
-					mb_sort($commentators_names); // to display in alphabetic order
-					$commentators_count++;
-				}
-
-				// add a new link
-				if (strlen($url) > 0)
-				{
-					$url_exists = false;
-					
-					foreach ($links as $nick => $urls)
-					{
-						if ($url_exists)
-							break;
-
-						$urls_total = count($urls);
-						for ($i = 0; $i < $urls_total; ++$i)
-						{
-							if ($urls[$i] == $url)
-							{
-								$url_exists = true;
-								echo '<div class="red">Этот комментарий зарегистрирован на <b>'.$nick.'</b> и уже номинирован.</div>';
-								break;
-							}
-						}
-					}
-
-					if (!$url_exists)
-					{
-						$links[$nickname][] = $url;
-						$links_count++;
-					}
-				}
-
-				// save data
-				file_put_contents("./seasons/".$workspace['current_season']."/commentators.txt", serialize($commentators));
-				file_put_contents("./seasons/".$workspace['current_season']."/".$week_number."-links.txt", serialize($links));
-			}
-		}
-
-	}
-
-	// delete a nominated comment
-	if ($_POST['todo'] == 'delete')
-	{
-		// find the element to delete
-		$nickname = $_POST['var1'];
-		$links_index = intval($_POST['var2']);
-
-		// delete
-		if (isset($links[$nickname]))
-		{
-			$links_total = count($links[$nickname]);
-			$links_new = [];
-			$j = 0;
-			for ($i = 0; $i < $links_total; ++$i)
-			{
-				if ($i == ($links_index))
-				{
-					$j++;
-					continue;
-				} else {
-					$links_new[$i - $j] = $links[$nickname][$i];
-				}
-			}
-			$links[$nickname] = $links_new;
-		}
-
-		// save data
-		file_put_contents("./seasons/".$workspace['current_season']."/".$week_number."-links.txt", serialize($links));
-	}
-
-	// remove a commentator from being nominated
-	if ($_POST['todo'] == 'remove')
-	{
-		// collect data
-		$nickname = $_POST['nickname'];
-		if (isset($commentators[$nickname]))
-		{
-			// remove the commentator
-			$commentators[$nickname]['removed'] = true;
-			$commentators[$nickname]['removed_date'] = mktime(0, 0, 0, intval(date('m')), intval(date('d')), intval(date('Y')));
-			
-			// remove links corresponding to the commentator
-			// if (isset($links[$nickname]))
-			// {
-			// 	unset($links[$nickname]);
-			// }
-
-			// save data
-			file_put_contents("./seasons/".$workspace['current_season']."/commentators.txt", serialize($commentators));
-			file_put_contents("./seasons/".$workspace['current_season']."/".$week_number."-links.txt", serialize($links));
-		} else {
-			echo '<div class="red">Комментатор с ником '.$nickname.' почему-то не зарегистрирован в базе.</div>';
-		}
-	}
-
-	if ($_POST['todo'] == 'bring_back')
-	{
-		// collect data
-		$nickname = $_POST['nickname'];
-		if (isset($commentators[$nickname]))
-		{
-			// remove the commentator
-			$commentators[$nickname]['removed'] = false;
-			$commentators[$nickname]['removed_date'] = mktime(0, 0, 0, intval(date('m')), intval(date('d')), intval(date('Y')));
-			
-			// remove links corresponding to the commentator
-			// if (isset($links[$nickname]))
-			// {
-			// 	unset($links[$nickname]);
-			// }
-
-			// save data
-			file_put_contents("./seasons/".$workspace['current_season']."/commentators.txt", serialize($commentators));
-			file_put_contents("./seasons/".$workspace['current_season']."/".$week_number."-links.txt", serialize($links));
-		} else {
-			echo '<div class="red">Комментатор с ником '.$nickname.' почему-то не зарегистрирован в базе.</div>';
-		}
-	}
-
-	// edit a link to nominated comment
-	if($_POST['todo'] == 'edit')
-	{
-		// collect data
-		$nickname = $_POST['var1'];
-		$link = intval($_POST['var2']);
-		$new = $_POST['var3'];
-
-		// update
-		$links[$nickname][$link] = $new;
-
-		// save data
-		file_put_contents("./seasons/".$workspace['current_season']."/".$week_number."-links.txt", serialize($links));
-	}
-}
-
-?>
-
+<?if($workspace['current_season']!=='none'):?>
 <form id='theForm' action='?mode=week_nominations' method="POST">
+	<?if($season_master):?>
 	<div class='gbox'>
 		<div class='header'>
 			Номинировать комментатора
@@ -206,8 +29,8 @@ if(isset($_POST['todo']))
 			</table>
 		</center>
 	</div>
-
 	&nbsp;<br>
+	<?endif;?>
 
 	<div class='gbox'>
 		<div class='header'>
@@ -215,11 +38,7 @@ if(isset($_POST['todo']))
 		</div>
 		<table style='width: 100%;'>
 
-			<?php
-				// write down all commentators
-				for ($commentator=0; $commentator < $commentators_count; ++$commentator)
-				{ 
-			?>
+			<?for ($commentator=0; $commentator < $commentators_count; ++$commentator):?>
 			<tr onmouseover="javascript: this.childNodes[1].style.backgroundColor = '#446688';"
 				onmouseout="javascript: this.childNodes[1].style.backgroundColor = '#000000';">
 				<td style='width: 200px; border-right: 1px solid #446688;'>
@@ -233,7 +52,9 @@ if(isset($_POST['todo']))
 							// echo 'Не номинируется с ' . date('d.m.Y', $commentators[$commentators_names[$commentator]]['removed_date']);
 						} else {
 					?>
+					<?if($user['group'] != 'guest'):?>
 						<input class="input-button red" type="button" name="remove" value="Снять" onClick="form_submitter('remove', '<?=$commentators_names[$commentator];?>');">
+					<?endif;?>
 					</div>
 					<?php
 						}
@@ -254,10 +75,12 @@ if(isset($_POST['todo']))
 						onmouseover="javascript: this.style.backgroundColor = '#224466';"
 						onmouseout="javascript: this.style.backgroundColor = '#000000';">
 						<a href="<?=$links[$commentators_names[$commentator]][$link];?>" target="_blank"> <?=$links[$commentators_names[$commentator]][$link];?> </a>
+					<?if($user['group'] != 'guest'):?>
 						<div style="float: right;">
 							<input class="input-button" type="button" name="edit" value="Править" onClick="form_submitter('edit', '<?=$commentators_names[$commentator];?>', <?=$link;?>);">
 							<input class="input-button red" type="button" name="delete" value="Удалить" onClick="form_submitter('delete', '<?=$commentators_names[$commentator];?>', <?=$link;?>);">
 						</div>						
+					<?endif;?>
 					</div>
 					<?php
 								}
@@ -272,12 +95,16 @@ if(isset($_POST['todo']))
 							{
 								echo 'Снят с Конкурса Комментариев ' . date('d.m.Y', $commentators[$commentators_names[$commentator]]['removed_date']);
 						?>
+						<?if($user['group'] != 'guest'):?>
 						<input class="input-button green" type="button" name="bring_back" value="Вернуть" onClick="form_submitter('bring_back', '<?=$commentators_names[$commentator];?>');">
+						<?endif;?>
 						<?php
 							} else {
 						?>
 						<br>
+						<?if($user['group'] != 'guest'):?>
 						<input class="input-button" type="button" name="new" value="Добавить ссылку" onClick="form_submitter('add', '<?=$commentators_names[$commentator];?>');">
+						<?endif;?>
 						<?php
 							}
 						?>
@@ -290,9 +117,7 @@ if(isset($_POST['todo']))
 					<hr>
 				</td>
 			</tr>
-			<?php
-				}
-			?>
+			<?endfor;?>
 
 		</table>
 	</div>
@@ -378,3 +203,4 @@ function form_submitter(todo, var1, var2, var3)
 	return false;
 }
 </script>
+<?endif;?>

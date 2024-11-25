@@ -1,36 +1,4 @@
-<?php
-
-// load commentators and links to comments
-if (is_file("./seasons/".$workspace['current_season']."/commentators.txt"))
-{
-	$commentators = unserialize(file_get_contents("./seasons/".$workspace['current_season']."/commentators.txt"));
-	foreach ($commentators as $key => $value)
-	{
-		$commentators_names[] = $key;
-	}
-	mb_sort($commentators_names); // to display in alphabetic order
-}
-if (is_file("./seasons/".$workspace['current_season']."/".$week_number."-links.txt"))
-{
-	$links = unserialize(file_get_contents("./seasons/".$workspace['current_season']."/".$week_number."-links.txt"));
-}
-
-// count how many commentators we have this season
-$commentators_count = count($commentators_names);
-// count how many links were nominated this week
-$links_count = count($links);
-
-
-// strings to paste
-$months = ['января', 'февраля', 'марта', 'апреля', 'мая', 'июня', 'июля', 'августа', 'сентября', 'октября', 'ноября', 'декабря'];
-
-$week_start_day = intval(date('d', $week_start));
-$week_end_day = intval(date('d', $week_end));
-$week_start_month = $months[intval(date('m', $week_start))-1];
-$week_end_month = $months[intval(date('m', $week_end))-1];
-$week_start_year = intval(date('Y', $week_start));
-$week_end_year = intval(date('Y', $week_end));
-?>
+<?php if (!defined('CCH')) die('Этот скрипт не может работать самостоятельно.'); ?>
 
 <div class='gbox'>
 	<div class='header'>
