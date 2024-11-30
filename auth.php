@@ -36,8 +36,6 @@ function login()
 			$_SESSION['group'] = 'admin';
 			return true;
 		} elseif (($login == $config['admin_login']) || ($password == $config['admin_password'])) {
-			error_message($config['admin_login'] . ' ' . $config['admin_password']);
-			error_message($login . ' ' . $password);
 			error_message('Неверный логин или пароль!');
 			return false;
 		}

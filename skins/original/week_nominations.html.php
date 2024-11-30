@@ -41,7 +41,7 @@
 			<?for ($commentator=0; $commentator < $commentators_count; ++$commentator):?>
 			<tr onmouseover="javascript: this.childNodes[1].style.backgroundColor = '#446688';"
 				onmouseout="javascript: this.childNodes[1].style.backgroundColor = '#000000';">
-				<td style='width: 200px; border-right: 1px solid #446688;'>
+				<td style='width: 200px; border-right: 1px solid #446688; vertical-align: top'>
 					<div id="<?=$commentators_names[$commentator];?>" style="margin-top: 0.25em; margin-left: 0.25em"><a href='#<?=$commentators_names[$commentator];?>'><?=$commentators_names[$commentator];?></a></div>
 
 					<br>
