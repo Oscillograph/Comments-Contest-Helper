@@ -15,7 +15,7 @@
 		</tr>
 		<tr>
 		<?for($i = 1; $i <= $values['weeks_count']; ++$i):?>
-			<td style='border-bottom: 1px solid #224488; <?=(($i != $values['weeks_count']) ? " border-right: 1px solid #224488; ":"");?> text-align: center; width: 3em;'><?=$i;?></td>
+			<td style='border-bottom: 1px solid #224488; <?=(($i != $values['weeks_count']) ? " border-right: 1px solid #224488; ":"");?> text-align: center; width: 3em;'><a href='?mode=week_results&season=<?=$season;?>&week=<?=$i;?>'><?=$i;?></a></td>
 		<?endfor;?>
 		</tr>
 

@@ -98,6 +98,7 @@ if ($user['group'] != 'guest')
 		}
 
 		// proceed with saving actual results of this week
+		// get a sorted array of commentators from highest votes to lowest
 		$commentators_votes_total = [];
 		for ($i = 0; $i < count($commentators_names); ++$i)
 		{
@@ -108,14 +109,38 @@ if ($user['group'] != 'guest')
 		}
 		rsort($commentators_votes_total, SORT_NUMERIC);
 		
-		$scores = [3, 2, 1 , 1, 1];
+		$scores = [];
+		switch (count($results))
+		{
+			case 4:
+			{
+				$scores = [3, 2, 1, 1];
+			} break;
+			case 3:
+			{
+				$scores = [3, 2, 1];
+			} break;
+			case 2:
+			{
+				$scores = [3, 2];
+			} break;
+			case 1:
+			{
+				$scores = [3];
+			} break;
+
+			default:
+			{
+				$scores = [3, 2, 1, 1, 1];
+			}
+		}
 		$places = [];
 
 		$excluded = []; // to make sure this is not an infinite cycle
-		while (count($places) < 5)
+		while (count($places) < count($scores))
 		{
-			$max = 0;
-			$contestants = [];
+			$max = 0; // most votes giving right to take the place
+			$contestants = []; // contestants per place
 
 			foreach($results as $nickname => $array)
 			{
@@ -138,23 +163,33 @@ if ($user['group'] != 'guest')
 				}
 			}
 
-			// calculate how much score each contestant gets
-			$score = 0;
-			for ($i = 0, $j = count($places); ($i < count($contestants)) && ($j < 5); ++$i, ++$j)
+			if (count($contestants) > 0)
 			{
-				$score += $scores[$j];
-			}
-			$score = round(100*$score / count($contestants))/100;
+				$score = 0;
+				if (count($results) >= count($places))
+				{
+					for ($i = 0, $j = count($places); ($i < count($contestants)) && ($j < count($scores)); ++$i, ++$j)
+					{
+						$score += $scores[$j];
+					}
+				}
 
-			// grant scores to contestants
-			foreach($contestants as $nickname => $value)
-			{
-				$places[$nickname] = $score;
-				$results[$nickname]['score'] = $score;
-				$commentators[$nickname]['score_weeks'][$week_number] = $score;
 
-				// and make sure they are no longer in the next cycles
-				$excluded[$nickname] = $max;
+				$score = round(100*$score / count($contestants))/100;
+
+				// grant scores to contestants
+				foreach($contestants as $nickname => $value)
+				{
+					$places[$nickname] = $score;
+					$results[$nickname]['score'] = $score;
+					$commentators[$nickname]['score_weeks'][$week_number] = $score;
+
+					// and make sure they are no longer in the next cycles
+					$excluded[$nickname] = $max;
+				}
+			} else {
+				// no contestants for the place - no need to continue the cycle
+				break;
 			}
 		}
 

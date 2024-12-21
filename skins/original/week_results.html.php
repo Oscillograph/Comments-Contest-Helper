@@ -3,7 +3,7 @@
 <form action='?mode=week_results&season=<?=$season;?>&week=<?=$week;?>' method='POST' id='theForm'>
 	<div class='gbox'>
 		<div class='header'>
-			Итоги недели
+			Итоги недели (<a href='?mode=season_results&season=<?=$season;?>'>перейти к результатам конкурса</a>)
 		</div>
 		<center>
 			<input type='hidden' id='step' name='step' value='<?=($step+1);?>'>
