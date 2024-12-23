@@ -205,4 +205,19 @@
 
 		</center>
 	</div>
+	<br>
+	<div class='gbox'>
+		<div class='header'>
+		Цветовые обозначения
+		</div>
+		<center>
+			<table style="text-align: center" cellspacing="5px">
+				<tr>
+					<td style="background-color: #113311;">Получены призовые баллы</td>
+					<td>Призовых баллов нет</td>
+					<td style="background-color: #882200;">Комментатор снят с конкурса</td>
+				</tr>
+			</table>
+		</center>
+	</div>
 </form>

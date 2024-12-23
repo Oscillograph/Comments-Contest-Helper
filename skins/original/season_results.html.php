@@ -52,13 +52,11 @@
 	<p>Участников конкурса комментариев: <?=(($commentators)?count($commentators):0);?><br>
 	Номинировалось комментариев: <?=$values['comments_total'];?><br>
 	Отдано голосов: <?=$values['votes_total'];?><br>
-	Самый номинируемый комментатор: <?php
-	for ($i = 0; $i < count($values['most_comments']); ++$i)
-	{
-		echo '<b>'.$values['most_comments'][$i]['nickname'].'</b> (комментариев: ' . $values['most_comments'][$i]['total']. ')' . (($i == (count($values['most_comments']) - 1)) ? '' : ', ');
-	}
-	?><br>
-	Самый любимый комментатор: <b><?=$values['most_votes'][0]['nickname'];?></b> (всего голосов: <?=$values['most_votes'][0]['total'];?>)
+	Самый номинируемый комментатор:
+	<?for($i = 0; $i < count($values['most_comments']); ++$i):?>
+		<b><?=$values['most_comments'][$i]['nickname'];?></b> (комментариев: <?=$values['most_comments'][$i]['total'];?>)<?=(($i == (count($values['most_comments']) - 1)) ? '' : ', ');?>
+	<?endfor;?><br>
+	Самый популярный комментатор: <b><?=$values['most_votes'][0]['nickname'];?></b> (всего голосов: <?=$values['most_votes'][0]['total'];?>)
 	<p>
 	<?else:?>
 	Скрыта ведущим.

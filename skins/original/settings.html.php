@@ -128,12 +128,12 @@
 									</tr>
 									<tr>
 										<td style='text-align: right'>
-										Статус:
+										Видимость результатов:
 										</td>
 										<td>
 										<select id='season_closed' name='season_closed'>
-											<option value='0'<?=(($seasons[$season]['closed'] != true)? ' selected':'')?>>Открыт</option>
-											<option value='1'<?=(($seasons[$season]['closed'] == true)? ' selected':'')?>>Закрыт</option>
+											<option value='0'<?=(($seasons[$season]['closed'] != true)? ' selected':'')?>>Открыты</option>
+											<option value='1'<?=(($seasons[$season]['closed'] == true)? ' selected':'')?>>Закрыты</option>
 										</select>
 										</td>
 									</tr>

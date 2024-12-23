@@ -46,68 +46,48 @@
 
 					<br>
 					<div style="margin-top: 0.25em; margin-left: 0.25em">
-					<?php
-						if ($commentators[$commentators_names[$commentator]]['removed'])
-						{
-							// echo 'Не номинируется с ' . date('d.m.Y', $commentators[$commentators_names[$commentator]]['removed_date']);
-						} else {
-					?>
-					<?if($user['group'] != 'guest'):?>
-						<input class="input-button red" type="button" name="remove" value="Снять" onClick="form_submitter('remove', '<?=$commentators_names[$commentator];?>');">
+					<?if ($commentators[$commentators_names[$commentator]]['removed']):?>
+						<!-- Не номинируется с <?=date('d.m.Y', $commentators[$commentators_names[$commentator]]['removed_date']);?> -->
+					<?else:?>
+						<?if($user['group'] != 'guest'):?>
+							<input class="input-button red" type="button" name="remove" value="Снять" onClick="form_submitter('remove', '<?=$commentators_names[$commentator];?>');">
+						<?endif;?>
+						</div>
 					<?endif;?>
-					</div>
-					<?php
-						}
-					?>
 				</td>
 				<td>
 
-					<?php
-						// write down all links
-						if ($links_count > 0)
-						{
-							if (isset($links[$commentators_names[$commentator]]) && !$commentators[$commentators_names[$commentator]]['removed'])
-							{
-								for ($link=0; $link < count($links[$commentators_names[$commentator]]); ++$link) 
-								{ 
-					?>
-					<div class="nominated-link"
-						onmouseover="javascript: this.style.backgroundColor = '#224466';"
-						onmouseout="javascript: this.style.backgroundColor = '#000000';">
-						<a href="<?=$links[$commentators_names[$commentator]][$link];?>" target="_blank"> <?=$links[$commentators_names[$commentator]][$link];?> </a>
-					<?if($user['group'] != 'guest'):?>
-						<div style="float: right;">
-							<input class="input-button" type="button" name="edit" value="Править" onClick="form_submitter('edit', '<?=$commentators_names[$commentator];?>', <?=$link;?>);">
-							<input class="input-button red" type="button" name="delete" value="Удалить" onClick="form_submitter('delete', '<?=$commentators_names[$commentator];?>', <?=$link;?>);">
-						</div>						
+					<?if($links_count > 0):?>
+						<?if(isset($links[$commentators_names[$commentator]]) && !$commentators[$commentators_names[$commentator]]['removed']):?>
+							<?for($link=0; $link < count($links[$commentators_names[$commentator]]); ++$link):?>
+								<div class="nominated-link"
+									onmouseover="javascript: this.style.backgroundColor = '#224466';"
+									onmouseout="javascript: this.style.backgroundColor = '#000000';">
+									<a href="<?=$links[$commentators_names[$commentator]][$link];?>" target="_blank"> <?=$links[$commentators_names[$commentator]][$link];?> </a>
+								<?if($user['group'] != 'guest'):?>
+									<div style="float: right;">
+										<input class="input-button" type="button" name="edit" value="Править" onClick="form_submitter('edit', '<?=$commentators_names[$commentator];?>', <?=$link;?>);">
+										<input class="input-button red" type="button" name="delete" value="Удалить" onClick="form_submitter('delete', '<?=$commentators_names[$commentator];?>', <?=$link;?>);">
+									</div>
+								<?endif;?>
+								</div>
+							<?endfor;?>
+						<?endif;?>
 					<?endif;?>
-					</div>
-					<?php
-								}
-							}
-						}
-					?>
 
 
 					<div style="text-align: center;">
-						<?php
-							if ($commentators[$commentators_names[$commentator]]['removed'])
-							{
-								echo 'Снят с Конкурса Комментариев ' . date('d.m.Y', $commentators[$commentators_names[$commentator]]['removed_date']);
-						?>
-						<?if($user['group'] != 'guest'):?>
-						<input class="input-button green" type="button" name="bring_back" value="Вернуть" onClick="form_submitter('bring_back', '<?=$commentators_names[$commentator];?>');">
+						<?if($commentators[$commentators_names[$commentator]]['removed']):?>
+							Снят с Конкурса Комментариев <?=date('d.m.Y', $commentators[$commentators_names[$commentator]]['removed_date']);?>
+							<?if($user['group'] != 'guest'):?>
+								<input class="input-button green" type="button" name="bring_back" value="Вернуть" onClick="form_submitter('bring_back', '<?=$commentators_names[$commentator];?>');">
+							<?endif;?>
+						<?else:?>
+							<br>
+							<?if($user['group'] != 'guest'):?>
+								<input class="input-button" type="button" name="new" value="Добавить ссылку" onClick="form_submitter('add', '<?=$commentators_names[$commentator];?>');">
+							<?endif;?>
 						<?endif;?>
-						<?php
-							} else {
-						?>
-						<br>
-						<?if($user['group'] != 'guest'):?>
-						<input class="input-button" type="button" name="new" value="Добавить ссылку" onClick="form_submitter('add', '<?=$commentators_names[$commentator];?>');">
-						<?endif;?>
-						<?php
-							}
-						?>
 					</div>
 				</td>
 			</tr>
