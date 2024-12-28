@@ -8,6 +8,7 @@
 			Номинировать комментатора
 		</div>
 		<center>
+		Чтобы просто добавить комментатора в таблицу, достаточно указать лишь его ник.<br><br>
 			<table>
 				<tr>
 					<td style="vertical-align: middle;">
@@ -34,7 +35,7 @@
 
 	<div class='gbox'>
 		<div class='header'>
-			Номинированные комментаторы
+			Номинированные комментаторы (<a href='?mode=week_results&season=<?=$season;?>&week=<?=$week;?>'>перейти к итогам недели</a>)
 		</div>
 		<table style='width: 100%;'>
 

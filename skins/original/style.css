@@ -55,6 +55,12 @@ a
 	color: #ffffff;
 }
 
+.gbox p
+{
+	margin:5px;
+	text-indent: 2em;
+}
+
 .nominated-link
 {
 	height: 1.5em;
