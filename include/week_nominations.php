@@ -93,7 +93,7 @@ if ($workspace['current_season'] !== 'none')
 			}
 
 			// save data
-			save_array("./data/seasons/".$workspace['current_season']."/".$week_number."-links.txt", $links);
+			save_array("./data/seasons/".$workspace['current_season']."/".$week_number."-links.php", $links);
 		}
 
 		// remove a commentator from being nominated
